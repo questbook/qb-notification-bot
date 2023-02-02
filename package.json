@@ -1,12 +1,27 @@
 {
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.262.0",
+    "@graphql-codegen/typescript-operations": "^2.5.13",
+    "cross-fetch": "^3.1.5",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
+    "graphql": "^16.6.0",
+    "graphql-request": "^5.1.0",
     "node-telegram-bot-api": "^0.61.0",
     "serverless-http": "^3.1.1",
     "telegraf": "^4.11.2"
   },
+  "scripts": {
+    "start": "NODE_ENV=development ts-node index.ts",
+    "codegen": "graphql-codegen --config codegen.ts"
+  },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.16.5",
+    "@graphql-codegen/introspection": "2.2.3",
+    "@graphql-codegen/typescript": "2.8.8",
+    "@graphql-codegen/typescript-document-nodes": "2.3.13",
+    "@graphql-codegen/typescript-mongodb": "2.4.6",
+    "@graphql-codegen/typescript-resolvers": "2.7.13",
     "@types/node-telegram-bot-api": "^0.57.6",
     "serverless-dotenv-plugin": "^4.0.2",
     "serverless-plugin-typescript": "^2.1.4",

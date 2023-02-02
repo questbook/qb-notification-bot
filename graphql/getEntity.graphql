@@ -1,0 +1,15 @@
+query getEntity($grantId: ID!, $appId: ID!) {
+    grant(id: $grantId) {
+        id
+        title
+    }
+
+    grantApplication(id: $appId) {
+        id
+        title: fields(where: {field_contains: "project_name"}) {
+            values {
+                value
+            }
+        }
+    }
+}
