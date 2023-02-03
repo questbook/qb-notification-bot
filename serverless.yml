@@ -26,9 +26,11 @@ functions:
   cron:
     handler: utils/sendNotifications.run
     timeout: 120
+    reservedConcurrency: 1
     events:
-      - schedule: rate(10 minutes)
+      - schedule: rate(1 minute)
 
 plugins:
   - serverless-plugin-typescript
+  - serverless-offline
   - serverless-dotenv-plugin

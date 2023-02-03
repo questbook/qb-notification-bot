@@ -1,6 +1,7 @@
 import {
   DynamoDBClient,
   GetItemCommand,
+  PutItemCommand,
   UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
@@ -17,7 +18,7 @@ import { permittedNotificationTypes, subgraphURLS } from "./constants";
 import { getMessage } from "./getMessage";
 import { sleep } from "./sleep";
 
-const run = async (
+export const run = async (
   event: APIGatewayProxyEvent,
   context: Context,
 ) => {
@@ -29,17 +30,13 @@ const run = async (
   const client = new DynamoDBClient({ region: "ap-south-1" });
   const command = new GetItemCommand({
     TableName: process.env.TABLE,
-    Key: { type: { S: "last-fetched" } },
+    Key: { key: { S: "last-fetched" } },
   });
   const response = await client.send(command);
   if (!response?.Item?.timestamp) {
-    const updateItemCommand = new UpdateItemCommand({
+    const updateItemCommand = new PutItemCommand({
       TableName: process.env.TABLE,
-      Key: { type: { S: "last-fetched" } },
-      UpdateExpression: "SET timestamp = :timestamp",
-      ExpressionAttributeValues: {
-        ":timestamp": { N: currentTimestamp.toString() },
-      },
+      Item: { key: {S : 'last-fetched'}, timestamp: { N: currentTimestamp.toString() } },
     });
 
     const updateResponse = await client.send(updateItemCommand);
@@ -49,6 +46,7 @@ const run = async (
     return;
   }
   const lastFetchedTimestamp = parseInt(response?.Item?.timestamp.N);
+  console.log(lastFetchedTimestamp, currentTimestamp)
 
   // 3. For each chain, fetch the notifications from the subgraph, and send out Telegram messages
   for (const chain in subgraphURLS) {
@@ -74,6 +72,11 @@ const run = async (
       skip += first;
     }
 
+    if (notifs.length === 0) {
+      console.log("No new notifications found on chain id: ", chain);
+      continue
+    }
+
     const bot = new Telegraf(process.env.BOT_TOKEN);
     for (const notif of notifs) {
       if (permittedNotificationTypes.indexOf(notif.type) === -1) continue
@@ -88,14 +91,10 @@ const run = async (
         let type = entity.startsWith('grant') ? 'gp' : entity.startsWith('application') ? 'app' : ''
         if (type === "") continue;
 
+        const key = `${type}-${entity.split('-')[1]}-${chain}`
         const command = new GetItemCommand({
           TableName: process.env.TABLE,
-          Key: { type: { S: type } },
-          ProjectionExpression: "#entity.#chain",
-          ExpressionAttributeNames: {
-            "#entity": entity,
-            "#chain": chain,
-          },
+          Key: { key: { S: key } },
         });
 
         const response = await client.send(command);
@@ -105,7 +104,7 @@ const run = async (
           );
         }
 
-        const users = unmarshall(response?.Item)[chain];
+        const users = unmarshall(response?.Item);
 
         // 2. Send a notification to each user - based on what type of notification it is
         let count = 0;
@@ -127,6 +126,15 @@ const run = async (
       }
     }
   }
-};
 
-export default run;
+  // 4. Update the timestamp in the database
+  const updateItemCommand = new PutItemCommand({
+    TableName: process.env.TABLE,
+    Item: { key: {S : 'last-fetched'}, timestamp: { N: currentTimestamp.toString() } },
+  });
+
+  const updateResponse = await client.send(updateItemCommand);
+  if (updateResponse?.$metadata?.httpStatusCode !== 200) {
+    console.log("Could not set current time!");
+  }
+};
