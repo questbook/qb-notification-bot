@@ -5,11 +5,8 @@ import { ethers } from "ethers";
 import {
   DynamoDBClient,
   GetItemCommand,
-  PutItemCommand,
-  UpdateItemCommand,
 } from "@aws-sdk/client-dynamodb";
 import { subgraphURLS } from "./utils/constants";
-import fetch from "cross-fetch";
 import { GraphQLClient } from "graphql-request";
 import { GetEntity, GetEntityQuery } from "./src/generated/graphql";
 import { addNewSubscription } from "./utils/addNewSubscription";
@@ -35,19 +32,18 @@ bot.start(async (ctx) => {
     try {
       const decodedPayload = Buffer.from(payload, "base64").toString("utf8");
       const [type, entity, _chain] = decodedPayload.split("-");
+      console.log('Setup notification for: ', type, entity, _chain)
       const chain = parseInt(_chain);
       if (!(chain in subgraphURLS)) throw new Error("Invalid chain");
       if (type !== "app" && type !== "gp") throw new Error("Invalid type");
       if (type === "gp" && !ethers.utils.isAddress(entity))
         throw new Error("Invalid grant address");
-      else if (type == "app" && parseInt(entity) <= 0)
-        throw new Error("Invalid app id");
 
       // 1. Check if this is a valid grant or app ID
       const graphQLClient = new GraphQLClient(subgraphURLS[chain]);
       const res: GetEntityQuery = await graphQLClient.request(GetEntity, {
-        grantId: type === "gp" ? entity : ethers.utils.hexZeroPad("0", 20),
-        appId: type === "app" ? parseInt(entity) : 0,
+        grantId: type === "gp" ? entity : "0x0000000000000000000000000000000000000000",
+        appId: type === "app" ? entity : "0x0",
       });
 
       if (type === "gp" && res.grant === null)
@@ -78,7 +74,13 @@ bot.start(async (ctx) => {
       }
 
       // 3. If valid, create subscription and reply with success message
-      const { addEntity, addChain, addSubscription } = addNewSubscription(type, type === 'gp' ? entity : parseInt(entity).toString(16), _chain, ctx.from.username, ctx.from.id.toString());
+      const { addEntity, addChain, addSubscription } = addNewSubscription(
+        type,
+        entity,
+        _chain,
+        ctx.from.username,
+        ctx.from.id.toString(),
+      );
       response = await client.send(addEntity);
       if (response.$metadata.httpStatusCode === 200) {
         response = await client.send(addChain);
@@ -86,7 +88,11 @@ bot.start(async (ctx) => {
           response = await client.send(addSubscription);
           if (response.$metadata.httpStatusCode === 200) {
             ctx.reply(
-              `You have successfully subscribed for updates to ${type === 'gp' ? 'grant program' : 'application'} ${type === 'gp' ? res.grant?.title : res?.grantApplication?.title}.`,
+              `You have successfully subscribed for updates to ${
+                type === "gp" ? "grant program" : "application"
+              } ${
+                type === "gp" ? res.grant?.title : res?.grantApplication?.title[0]?.values[0]?.value
+              }.`,
             );
           }
         }
@@ -106,7 +112,7 @@ bot.start(async (ctx) => {
 
 bot.on("message", async (ctx) => {
   await ctx.reply(
-    `Sorry ${ctx.from.first_name}, we do not support this message!`,
+    `Sorry ${ctx.from.first_name}, I do not understand that!`,
   );
 });
 

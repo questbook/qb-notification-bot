@@ -5249,7 +5249,17 @@ export type GetEntityQueryVariables = Exact<{
 }>;
 
 
-export type GetEntityQuery = { __typename?: 'Query', grant?: { __typename?: 'Grant', id: string, title: string } | null, grantApplication?: { __typename?: 'GrantApplication', id: string, title: Array<{ __typename?: 'GrantFieldAnswer', values: Array<{ __typename?: 'GrantFieldAnswerItem', value: string }> }> } | null };
+export type GetEntityQuery = { __typename?: 'Query', grant?: { __typename?: 'Grant', id: string, title: string } | null, grantApplication?: { __typename?: 'GrantApplication', id: string, grant: { __typename?: 'Grant', id: string, title: string }, title: Array<{ __typename?: 'GrantFieldAnswer', values: Array<{ __typename?: 'GrantFieldAnswerItem', value: string }> }> } | null };
+
+export type GetNotificationsQueryVariables = Exact<{
+  first: Scalars['Int'];
+  skip: Scalars['Int'];
+  from: Scalars['Int'];
+  to: Scalars['Int'];
+}>;
+
+
+export type GetNotificationsQuery = { __typename?: 'Query', notifications: Array<{ __typename?: 'Notification', id: string, title: string, content: string, type: NotificationType, entityIds: Array<string>, actorId?: any | null, cursor: number }> };
 
 
 export const GetEntity = gql`
@@ -5260,11 +5270,34 @@ export const GetEntity = gql`
   }
   grantApplication(id: $appId) {
     id
-    title: fields(where: {field_contains: "project_name"}) {
+    grant {
+      id
+      title
+    }
+    title: fields(where: {field_ends_with: "projectName"}) {
       values {
         value
       }
     }
+  }
+}
+    `;
+export const GetNotifications = gql`
+    query getNotifications($first: Int!, $skip: Int!, $from: Int!, $to: Int!) {
+  notifications(
+    first: $first
+    skip: $skip
+    where: {cursor_gt: $from, cursor_lte: $to}
+    orderBy: cursor
+    orderDirection: asc
+  ) {
+    id
+    title
+    content
+    type
+    entityIds
+    actorId
+    cursor
   }
 }
     `;

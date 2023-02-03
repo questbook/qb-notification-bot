@@ -1,0 +1,17 @@
+query getNotifications($first: Int!, $skip: Int!, $from: Int!, $to: Int!) {
+  notifications(
+    first: $first
+    skip: $skip
+    where: {cursor_gt: $from, cursor_lte: $to}
+    orderBy: cursor
+    orderDirection: asc
+  ) {
+    id
+    title
+    content
+    type
+    entityIds
+  	actorId
+    cursor
+  }
+}

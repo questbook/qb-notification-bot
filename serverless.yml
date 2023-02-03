@@ -16,12 +16,18 @@ provider:
     cors: true
 
 functions:
-  echo:
+  webhook:
     handler: index.QBbot
     events:
       - httpApi:
           path: /telegraf
           method: post
+
+  cron:
+    handler: utils/sendNotifications.run
+    timeout: 120
+    events:
+      - schedule: rate(10 minutes)
 
 plugins:
   - serverless-plugin-typescript
