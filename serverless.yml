@@ -28,7 +28,7 @@ functions:
     timeout: 120
     reservedConcurrency: 1
     events:
-      - schedule: rate(1 minute)
+      - schedule: rate(5 minutes)
 
 plugins:
   - serverless-plugin-typescript

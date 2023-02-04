@@ -18,7 +18,6 @@ const client = new DynamoDBClient({ region: "ap-south-1" });
 // echo
 // bot.on("message", ctx => ctx.reply(ctx.message.));
 bot.start(async (ctx) => {
-  console.log(JSON.stringify(ctx))
   if (!ctx.update?.message?.from?.username) {
     ctx.reply(
       "Oops! You need a username to use this bot! Please visit https://questbook.app to get started!",

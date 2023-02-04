@@ -46,7 +46,6 @@ export const run = async (
     return;
   }
   const lastFetchedTimestamp = parseInt(response?.Item?.timestamp.N);
-  console.log(lastFetchedTimestamp, currentTimestamp)
 
   // 3. For each chain, fetch the notifications from the subgraph, and send out Telegram messages
   for (const chain in subgraphURLS) {
@@ -104,16 +103,22 @@ export const run = async (
           );
         }
 
+        if(!response?.Item) continue
+
         const users = unmarshall(response?.Item);
+        delete users.key;
+        console.log(users)
 
         // 2. Send a notification to each user - based on what type of notification it is
         let count = 0;
       
         const message = getMessage(type as 'gp' | 'app', chain.toString(), entityInfo, notif);
         if (message === '') continue
+        console.log(message)
         for (const user in users) {
+          console.log(user, users[user])
           const chatId = users[user];
-          await bot.telegram.sendMessage(chatId, message);
+          await bot.telegram.sendMessage(chatId, message, {parse_mode: 'HTML'});
           ++count;
           if (count > 20) {
             // Wait for 1 second if the list of users > 30 - since Telegram only permits 30 messages per second
