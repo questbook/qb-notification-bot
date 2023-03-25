@@ -15,5 +15,6 @@ query getEntity($grantId: ID!, $appId: ID!) {
         value
       }
     }
+    version
   }
 }

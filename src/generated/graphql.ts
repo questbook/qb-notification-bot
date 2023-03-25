@@ -501,6 +501,7 @@ export type FundsTransfer = {
 };
 
 export enum FundsTransferStatusType {
+  Cancelled = 'cancelled',
   Executed = 'executed',
   Queued = 'queued'
 }
@@ -778,11 +779,20 @@ export type Grant = {
   link?: Maybe<Scalars['String']>;
   /** People who will manage the grant. They can see the PII submitted in an application */
   managers: Array<GrantManager>;
+  /** metadata hash that is used to fetch the grant details */
   metadataHash: Scalars['String'];
   /** milestones required */
   milestones?: Maybe<Array<Scalars['String']>>;
   /** Number of applications in the grant */
   numberOfApplications: Scalars['Int'];
+  /** total number of applications awaiting resubmission in the grant program */
+  numberOfApplicationsAwaitingResubmission: Scalars['Int'];
+  /** total number of pending applications in the grant program */
+  numberOfApplicationsPending: Scalars['Int'];
+  /** total number of rejected applications in the grant program */
+  numberOfApplicationsRejected: Scalars['Int'];
+  /** total number of approved applications in the grant program */
+  numberOfApplicationsSelected: Scalars['Int'];
   /** type of payout */
   payoutType?: Maybe<PayoutType>;
   /** Review type */
@@ -799,9 +809,9 @@ export type Grant = {
   summary: Scalars['String'];
   title: Scalars['String'];
   /** total grant funding committed in USD */
-  totalGrantFundingCommittedUSD: Scalars['Int'];
+  totalGrantFundingCommittedUSD: Scalars['BigInt'];
   /** total grant funding committed in USD */
-  totalGrantFundingDisbursedUSD: Scalars['Int'];
+  totalGrantFundingDisbursedUSD: Scalars['BigInt'];
   /** in seconds since epoch */
   updatedAtS?: Maybe<Scalars['Int']>;
   /** Workspace which created the grant */
@@ -885,6 +895,8 @@ export type GrantApplication = {
   updatedAtS: Scalars['Int'];
   /** Version of the application, incremented on resubmission */
   version: Scalars['Int'];
+  /** Wallet Address of the applicant */
+  walletAddress: Scalars['Bytes'];
 };
 
 
@@ -1362,6 +1374,12 @@ export type GrantApplication_Filter = {
   version_lte?: InputMaybe<Scalars['Int']>;
   version_not?: InputMaybe<Scalars['Int']>;
   version_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  walletAddress?: InputMaybe<Scalars['Bytes']>;
+  walletAddress_contains?: InputMaybe<Scalars['Bytes']>;
+  walletAddress_in?: InputMaybe<Array<Scalars['Bytes']>>;
+  walletAddress_not?: InputMaybe<Scalars['Bytes']>;
+  walletAddress_not_contains?: InputMaybe<Scalars['Bytes']>;
+  walletAddress_not_in?: InputMaybe<Array<Scalars['Bytes']>>;
 };
 
 export enum GrantApplication_OrderBy {
@@ -1384,7 +1402,8 @@ export enum GrantApplication_OrderBy {
   Reviews = 'reviews',
   State = 'state',
   UpdatedAtS = 'updatedAtS',
-  Version = 'version'
+  Version = 'version',
+  WalletAddress = 'walletAddress'
 }
 
 export type GrantField = {
@@ -1918,6 +1937,38 @@ export type Grant_Filter = {
   milestones_not_contains?: InputMaybe<Array<Scalars['String']>>;
   milestones_not_contains_nocase?: InputMaybe<Array<Scalars['String']>>;
   numberOfApplications?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsAwaitingResubmission?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsAwaitingResubmission_gt?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsAwaitingResubmission_gte?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsAwaitingResubmission_in?: InputMaybe<Array<Scalars['Int']>>;
+  numberOfApplicationsAwaitingResubmission_lt?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsAwaitingResubmission_lte?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsAwaitingResubmission_not?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsAwaitingResubmission_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  numberOfApplicationsPending?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsPending_gt?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsPending_gte?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsPending_in?: InputMaybe<Array<Scalars['Int']>>;
+  numberOfApplicationsPending_lt?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsPending_lte?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsPending_not?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsPending_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  numberOfApplicationsRejected?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsRejected_gt?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsRejected_gte?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsRejected_in?: InputMaybe<Array<Scalars['Int']>>;
+  numberOfApplicationsRejected_lt?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsRejected_lte?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsRejected_not?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsRejected_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  numberOfApplicationsSelected?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsSelected_gt?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsSelected_gte?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsSelected_in?: InputMaybe<Array<Scalars['Int']>>;
+  numberOfApplicationsSelected_lt?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsSelected_lte?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsSelected_not?: InputMaybe<Scalars['Int']>;
+  numberOfApplicationsSelected_not_in?: InputMaybe<Array<Scalars['Int']>>;
   numberOfApplications_gt?: InputMaybe<Scalars['Int']>;
   numberOfApplications_gte?: InputMaybe<Scalars['Int']>;
   numberOfApplications_in?: InputMaybe<Array<Scalars['Int']>>;
@@ -2043,22 +2094,22 @@ export type Grant_Filter = {
   title_not_starts_with_nocase?: InputMaybe<Scalars['String']>;
   title_starts_with?: InputMaybe<Scalars['String']>;
   title_starts_with_nocase?: InputMaybe<Scalars['String']>;
-  totalGrantFundingCommittedUSD?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingCommittedUSD_gt?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingCommittedUSD_gte?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingCommittedUSD_in?: InputMaybe<Array<Scalars['Int']>>;
-  totalGrantFundingCommittedUSD_lt?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingCommittedUSD_lte?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingCommittedUSD_not?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingCommittedUSD_not_in?: InputMaybe<Array<Scalars['Int']>>;
-  totalGrantFundingDisbursedUSD?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingDisbursedUSD_gt?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingDisbursedUSD_gte?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingDisbursedUSD_in?: InputMaybe<Array<Scalars['Int']>>;
-  totalGrantFundingDisbursedUSD_lt?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingDisbursedUSD_lte?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingDisbursedUSD_not?: InputMaybe<Scalars['Int']>;
-  totalGrantFundingDisbursedUSD_not_in?: InputMaybe<Array<Scalars['Int']>>;
+  totalGrantFundingCommittedUSD?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingCommittedUSD_gt?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingCommittedUSD_gte?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingCommittedUSD_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  totalGrantFundingCommittedUSD_lt?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingCommittedUSD_lte?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingCommittedUSD_not?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingCommittedUSD_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  totalGrantFundingDisbursedUSD?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingDisbursedUSD_gt?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingDisbursedUSD_gte?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingDisbursedUSD_in?: InputMaybe<Array<Scalars['BigInt']>>;
+  totalGrantFundingDisbursedUSD_lt?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingDisbursedUSD_lte?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingDisbursedUSD_not?: InputMaybe<Scalars['BigInt']>;
+  totalGrantFundingDisbursedUSD_not_in?: InputMaybe<Array<Scalars['BigInt']>>;
   updatedAtS?: InputMaybe<Scalars['Int']>;
   updatedAtS_gt?: InputMaybe<Scalars['Int']>;
   updatedAtS_gte?: InputMaybe<Scalars['Int']>;
@@ -2108,6 +2159,10 @@ export enum Grant_OrderBy {
   MetadataHash = 'metadataHash',
   Milestones = 'milestones',
   NumberOfApplications = 'numberOfApplications',
+  NumberOfApplicationsAwaitingResubmission = 'numberOfApplicationsAwaitingResubmission',
+  NumberOfApplicationsPending = 'numberOfApplicationsPending',
+  NumberOfApplicationsRejected = 'numberOfApplicationsRejected',
+  NumberOfApplicationsSelected = 'numberOfApplicationsSelected',
   PayoutType = 'payoutType',
   ReviewType = 'reviewType',
   Reward = 'reward',
@@ -4539,10 +4594,6 @@ export type Workspace = {
   metadataHash: Scalars['String'];
   /** timestamp of when the latest grant was posted */
   mostRecentGrantPostedAtS: Scalars['Int'];
-  /** total number of applications the DAO has received */
-  numberOfApplications: Scalars['Int'];
-  /** total number of applications the DAO has accepted */
-  numberOfApplicationsSelected: Scalars['Int'];
   /** Address of the owner of the workspace */
   ownerId: Scalars['Bytes'];
   partners: Array<Partner>;
@@ -5113,22 +5164,6 @@ export type Workspace_Filter = {
   mostRecentGrantPostedAtS_lte?: InputMaybe<Scalars['Int']>;
   mostRecentGrantPostedAtS_not?: InputMaybe<Scalars['Int']>;
   mostRecentGrantPostedAtS_not_in?: InputMaybe<Array<Scalars['Int']>>;
-  numberOfApplications?: InputMaybe<Scalars['Int']>;
-  numberOfApplicationsSelected?: InputMaybe<Scalars['Int']>;
-  numberOfApplicationsSelected_gt?: InputMaybe<Scalars['Int']>;
-  numberOfApplicationsSelected_gte?: InputMaybe<Scalars['Int']>;
-  numberOfApplicationsSelected_in?: InputMaybe<Array<Scalars['Int']>>;
-  numberOfApplicationsSelected_lt?: InputMaybe<Scalars['Int']>;
-  numberOfApplicationsSelected_lte?: InputMaybe<Scalars['Int']>;
-  numberOfApplicationsSelected_not?: InputMaybe<Scalars['Int']>;
-  numberOfApplicationsSelected_not_in?: InputMaybe<Array<Scalars['Int']>>;
-  numberOfApplications_gt?: InputMaybe<Scalars['Int']>;
-  numberOfApplications_gte?: InputMaybe<Scalars['Int']>;
-  numberOfApplications_in?: InputMaybe<Array<Scalars['Int']>>;
-  numberOfApplications_lt?: InputMaybe<Scalars['Int']>;
-  numberOfApplications_lte?: InputMaybe<Scalars['Int']>;
-  numberOfApplications_not?: InputMaybe<Scalars['Int']>;
-  numberOfApplications_not_in?: InputMaybe<Array<Scalars['Int']>>;
   ownerId?: InputMaybe<Scalars['Bytes']>;
   ownerId_contains?: InputMaybe<Scalars['Bytes']>;
   ownerId_in?: InputMaybe<Array<Scalars['Bytes']>>;
@@ -5199,8 +5234,6 @@ export enum Workspace_OrderBy {
   Members = 'members',
   MetadataHash = 'metadataHash',
   MostRecentGrantPostedAtS = 'mostRecentGrantPostedAtS',
-  NumberOfApplications = 'numberOfApplications',
-  NumberOfApplicationsSelected = 'numberOfApplicationsSelected',
   OwnerId = 'ownerId',
   Partners = 'partners',
   Safe = 'safe',
@@ -5249,7 +5282,7 @@ export type GetEntityQueryVariables = Exact<{
 }>;
 
 
-export type GetEntityQuery = { __typename?: 'Query', grant?: { __typename?: 'Grant', id: string, title: string } | null, grantApplication?: { __typename?: 'GrantApplication', id: string, grant: { __typename?: 'Grant', id: string, title: string }, title: Array<{ __typename?: 'GrantFieldAnswer', values: Array<{ __typename?: 'GrantFieldAnswerItem', value: string }> }> } | null };
+export type GetEntityQuery = { __typename?: 'Query', grant?: { __typename?: 'Grant', id: string, title: string } | null, grantApplication?: { __typename?: 'GrantApplication', id: string, version: number, grant: { __typename?: 'Grant', id: string, title: string }, title: Array<{ __typename?: 'GrantFieldAnswer', values: Array<{ __typename?: 'GrantFieldAnswerItem', value: string }> }> } | null };
 
 export type GetNotificationsQueryVariables = Exact<{
   first: Scalars['Int'];
@@ -5279,6 +5312,7 @@ export const GetEntity = gql`
         value
       }
     }
+    version
   }
 }
     `;

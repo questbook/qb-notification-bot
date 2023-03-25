@@ -10,7 +10,7 @@ import { addNewSubscription } from "./utils/addNewSubscription";
 import { unmarshall } from "@aws-sdk/util-dynamodb";
 
 dotenv.config();
-const token = process.env.BOT_TOKEN!;
+const token = process.env.NODE_ENV === 'development' ? process.env.TEST_BOT_TOKEN! : process.env.BOT_TOKEN!;
 const bot = new Telegraf(token);
 
 const client = new DynamoDBClient({ region: "ap-south-1" });
@@ -26,11 +26,13 @@ bot.start(async (ctx) => {
   }
 
   const payload = ctx.startPayload;
+  console.log(payload)
   if (payload) {
     try {
       const decodedPayload = Buffer.from(payload, "base64").toString("utf8");
-      const [type, entity, _chain] = decodedPayload.split("-");
-      console.log("Setup notification for: ", type, entity, _chain);
+      console.log(decodedPayload)
+      const [type, entity, _chain, scwAddress] = decodedPayload.split("-");
+      console.log("Setup notification for: ", type, entity, _chain, scwAddress);
       const chain = parseInt(_chain);
       if (!(chain in subgraphURLS)) throw new Error("Invalid chain");
       if (type !== "app" && type !== "gp") throw new Error("Invalid type");

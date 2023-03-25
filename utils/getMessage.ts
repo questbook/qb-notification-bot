@@ -5,7 +5,13 @@ const getMessage = (type: 'app' | 'gp', chain: string, entityInfo: GetEntityQuer
     switch(notification.type) {
         case 'application_submitted':
             if (type === 'app') return ''
-            else return `A new proposal received for grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain)}">Dashboard</a> to view the update`
+            else {
+                if (entityInfo.grantApplication?.version === 1) {
+                    return `A new proposal received for grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain)}">Dashboard</a> to view the update`
+                } else {
+                    return `Propsal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> was resubmitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to view the update.`
+                }
+            }
 
         case 'application_accepted':
             return `The proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b> has been accepted. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to view the update.`
