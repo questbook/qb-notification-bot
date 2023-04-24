@@ -7,33 +7,33 @@ const getMessage = (type: 'app' | 'gp', chain: string, entityInfo: GetEntityQuer
             if (type === 'app') return ''
             else {
                 if (entityInfo.grantApplication?.version === 1) {
-                    return `A new proposal received for grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain)}">Dashboard</a> to view the update`
+                    return `A new proposal received for grant program <b>${entityInfo.grant?.title}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain)}\">Dashboard</a> to view the update`
                 } else {
-                    return `Propsal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> was resubmitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to view the update.`
+                    return `Propsal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> was resubmitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the update.`
                 }
             }
 
         case 'application_accepted':
-            return `The proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b> has been accepted. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to view the update.`
+            return `The proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b> has been accepted. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the update.`
         
         case 'application_rejected':
-            return `The proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b> was rejected. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to see the reason.`
+            return `The proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b> was rejected. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to see the reason.`
 
         case 'application_resubmitted':
-            return `The proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b> was asked to resubmitted. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to view the update.`
+            return `The proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b> was asked to resubmitted. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the update.`
 
         case 'comment_added':
-            return `A new comment was received to proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to view the comment.`
+            return `A new comment was received to proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the comment.`
 
         case 'funds_disbursed_from_safe':
             if (notification.title.includes('executed')) {
-                return `Funds have been sent to builder for proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to see more details.`
+                return `Funds have been sent to builder for proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to see more details.`
             } else {
-                return `Payout has been initiated to builder for proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to see more details.`
+                return `Payout has been initiated to builder for proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to see more details.`
             }
 
         case 'review_submitted':
-            return `Review submitted for proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href="${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}">Dashboard</a> to view the submitted review.`
+            return `Review submitted for proposal with title <b>${entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value}</b> submitted to grant program <b>${entityInfo.grant?.title}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the submitted review.`
 
         default:
             return ''
