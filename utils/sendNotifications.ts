@@ -18,10 +18,7 @@ import { permittedNotificationTypes, subgraphURLS } from "./constants";
 import { getMessage } from "./getMessage";
 import { sleep } from "./sleep";
 
-export const run = async (
-  event: APIGatewayProxyEvent,
-  context: Context,
-) => {
+export const run = async (event: APIGatewayProxyEvent, context: Context) => {
   // 1. Get the current timestamp
   const date = new Date();
   const currentTimestamp = Math.floor(date.getTime() / 1000);
@@ -36,7 +33,10 @@ export const run = async (
   if (!response?.Item?.timestamp) {
     const updateItemCommand = new PutItemCommand({
       TableName: process.env.TABLE,
-      Item: { key: {S : 'last-fetched'}, timestamp: { N: currentTimestamp.toString() } },
+      Item: {
+        key: { S: "last-fetched" },
+        timestamp: { N: currentTimestamp.toString() },
+      },
     });
 
     const updateResponse = await client.send(updateItemCommand);
@@ -62,7 +62,7 @@ export const run = async (
           skip,
           from: lastFetchedTimestamp,
           to: currentTimestamp,
-        },
+        }
       );
 
       notifs.push(...res.notifications);
@@ -73,24 +73,36 @@ export const run = async (
 
     if (notifs.length === 0) {
       console.log("No new notifications found on chain id: ", chain);
-      continue
+      continue;
     }
 
     const bot = new Telegraf(process.env.BOT_TOKEN);
     for (const notif of notifs) {
-      if (permittedNotificationTypes.indexOf(notif.type) === -1) continue
+      if (permittedNotificationTypes.indexOf(notif.type) === -1) continue;
 
-      const entityInfo: GetEntityQuery = await graphQLClient.request(GetEntity, {
-        grantId: notif.entityIds.find(e => e.startsWith('grant'))?.split('-')[1] ?? "0x0000000000000000000000000000000000000000",
-        appId: notif.entityIds.find(e => e.startsWith('application'))?.split('-')[1] ?? "0x0",
-      });
+      const entityInfo: GetEntityQuery = await graphQLClient.request(
+        GetEntity,
+        {
+          grantId:
+            notif.entityIds.find((e) => e.startsWith("grant"))?.split("-")[1] ??
+            "0x0000000000000000000000000000000000000000",
+          appId:
+            notif.entityIds
+              .find((e) => e.startsWith("application"))
+              ?.split("-")[1] ?? "0x0",
+        }
+      );
 
       for (const entity of notif.entityIds) {
         // 1. Fetch the list of users subscribed to this entity
-        let type = entity.startsWith('grant') ? 'gp' : entity.startsWith('application') ? 'app' : ''
+        let type = entity.startsWith("grant")
+          ? "gp"
+          : entity.startsWith("application")
+          ? "app"
+          : "";
         if (type === "") continue;
 
-        const key = `${type}-${entity.split('-')[1]}-${chain}`
+        const key = `${type}-${entity.split("-")[1]}-${chain}`;
         const command = new GetItemCommand({
           TableName: process.env.TABLE,
           Key: { key: { S: key } },
@@ -99,31 +111,42 @@ export const run = async (
         const response = await client.send(command);
         if (response?.$metadata?.httpStatusCode !== 200) {
           console.log(
-            `Could not fetch subscribed IDs for entity: ${entity} (${notif.id})`,
+            `Could not fetch subscribed IDs for entity: ${entity} (${notif.id})`
           );
         }
 
-        if(!response?.Item) continue
+        if (!response?.Item) continue;
 
         const users = unmarshall(response?.Item);
         delete users.key;
-        console.log(users)
+        console.log(users);
 
         // 2. Send a notification to each user - based on what type of notification it is
         let count = 0;
-      
-        const message = getMessage(type as 'gp' | 'app', chain.toString(), entityInfo, notif);
-        if (message === '') continue
-        console.log(message)
+
+        const message = getMessage(
+          type as "gp" | "app",
+          chain.toString(),
+          entityInfo,
+          notif
+        );
+        if (message === "") continue;
+        console.log(message);
         for (const user in users) {
-          console.log(user, users[user])
+          console.log(user, users[user]);
           const chatId = users[user];
-          await bot.telegram.sendMessage(chatId, message, {parse_mode: 'HTML'});
-          ++count;
-          if (count > 20) {
-            // Wait for 1 second if the list of users > 30 - since Telegram only permits 30 messages per second
-            count = 0;
-            await sleep(1000);
+          try {
+            await bot.telegram.sendMessage(chatId, message, {
+              parse_mode: "HTML",
+            });
+            ++count;
+            if (count > 20) {
+              // Wait for 1 second if the list of users > 30 - since Telegram only permits 30 messages per second
+              count = 0;
+              await sleep(1000);
+            }
+          } catch (e) {
+            console.error("Error sending message to chatId: ", chatId, e);
           }
         }
 
@@ -135,7 +158,10 @@ export const run = async (
   // 4. Update the timestamp in the database
   const updateItemCommand = new PutItemCommand({
     TableName: process.env.TABLE,
-    Item: { key: {S : 'last-fetched'}, timestamp: { N: currentTimestamp.toString() } },
+    Item: {
+      key: { S: "last-fetched" },
+      timestamp: { N: currentTimestamp.toString() },
+    },
   });
 
   const updateResponse = await client.send(updateItemCommand);
