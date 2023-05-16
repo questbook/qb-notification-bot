@@ -77,9 +77,6 @@ bot.start(async (ctx) => {
       // 3. If valid, create subscription and reply with success message
       const { addSubscription } = addNewSubscription(
         key,
-        type,
-        entity,
-        _chain,
         ctx.update?.message?.from?.username,
         ctx.update?.message?.from?.id?.toString(),
       );
