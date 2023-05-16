@@ -1,4 +1,4 @@
-query getEntity($grantId: ID!, $appId: ID!) {
+query getEntity($grantId: String!, $appId: ID!, $timestamp: Int!) {
   grant(id: $grantId) {
     id
     title
@@ -16,5 +16,17 @@ query getEntity($grantId: ID!, $appId: ID!) {
       }
     }
     version
+  }
+
+  comments(where: {createdAt: $timestamp}) {
+    id
+    commentsPublicHash
+    grant {
+      id
+    }
+    application {
+      id
+    }
+    isPrivate
   }
 }

@@ -1,72 +1,29 @@
-<!--
-title: 'AWS NodeJS Example'
-description: 'This template demonstrates how to deploy a NodeJS function running on AWS Lambda using the traditional Serverless Framework.'
-layout: Doc
-framework: v3
-platform: AWS
-language: nodeJS
-priority: 1
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Questbook Telegram Notification Bot
 
+Welcome to the repository for our [Questbook Telegram Bot](https://t.me/qb_notif_bot) webhook, an efficient and scalable solution that manages new subscription requests and periodically sends out messages to subscribed users. This webhook is designed using the pub-sub architecture.
 
-# Serverless Framework AWS NodeJS Example
+This Telegram bot enables users to subscribe or unsubscribe from grant program updates, allowing them to receive periodic messages containing relevant. Leveraging the pub-sub pattern, the bot is capable of managing a high volume of subscription requests and messages, all while maintaining a responsive user experience.
 
-This template demonstrates how to deploy a NodeJS function running on AWS Lambda using the traditional Serverless Framework. The deployed function does not include any event definitions as well as any kind of persistence (database). For more advanced configurations check out the [examples repo](https://github.com/serverless/examples/) which includes integrations with SQS, DynamoDB or examples of functions that are triggered in `cron`-like manner. For details about configuration of specific `events`, please refer to our [documentation](https://www.serverless.com/framework/docs/providers/aws/events/).
+## Repository Structure
 
-## Usage
+- `src/generated/graphql.ts`: Contains the source code for the webhook.
+- `graphql/`: Contains configuration files for setting up the webhook and API credentials.
+  - `getNotifications.graphql`: 
+  - `getEntity.graphql`: 
+- `utils/`: Contains unit tests for ensuring the reliability and accuracy of the code.
+  - `addNewSubscription.ts`:
+  - `constants.ts`: 
+  - `getDashboardLink.ts`: 
+  - `getMessage.ts`: 
+  - `sendNotifications.ts`: 
+  - `sleep.ts`: 
+- `codegen.ts`: 
+- `index.ts`: 
+- `serverless.yaml`: 
+- `README.md`: Provides a comprehensive guide on setting up and using the webhook.
 
-### Deployment
+## Getting Started
 
-In order to deploy the example, you need to run the following command:
+To set up the webhook and start using it, please follow the instructions provided in the `README.md` file. This will guide you through the installation of required dependencies, configuration of the webhook, and deployment of the bot.
 
-```
-$ serverless deploy
-```
-
-After running deploy, you should see output similar to:
-
-```bash
-Deploying aws-node-project to stage dev (us-east-1)
-
-✔ Service deployed to stack aws-node-project-dev (112s)
-
-functions:
-  hello: aws-node-project-dev-hello (1.5 kB)
-```
-
-### Invocation
-
-After successful deployment, you can invoke the deployed function by using the following command:
-
-```bash
-serverless invoke --function hello
-```
-
-Which should result in response similar to the following:
-
-```json
-{
-    "statusCode": 200,
-    "body": "{\n  \"message\": \"Go Serverless v3.0! Your function executed successfully!\",\n  \"input\": {}\n}"
-}
-```
-
-### Local development
-
-You can invoke your function locally by using the following command:
-
-```bash
-serverless invoke local --function hello
-```
-
-Which should result in response similar to the following:
-
-```
-{
-    "statusCode": 200,
-    "body": "{\n  \"message\": \"Go Serverless v3.0! Your function executed successfully!\",\n  \"input\": \"\"\n}"
-}
-```
+We hope you find this Telegram bot webhook useful and efficient for managing subscriptions and sending periodic messages to users. If you encounter any issues or have suggestions for improvements, feel free to create an issue or submit a pull request. Happy messaging!

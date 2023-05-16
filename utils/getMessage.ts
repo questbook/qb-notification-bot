@@ -1,11 +1,12 @@
 import { GetEntityQuery, GetNotificationsQuery } from "../src/generated/graphql";
 import { getDashboardLink } from "./getDashboardLink";
+import { getFromIPFS } from "./ipfs";
 
 const sanitizeString = (str: string): string => {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-const getMessage = (type: 'app' | 'gp', chain: string, entityInfo: GetEntityQuery, notification: GetNotificationsQuery['notifications'][number]): string => {
+const getMessage = async (type: 'app' | 'gp', chain: string, entityInfo: GetEntityQuery, notification: GetNotificationsQuery['notifications'][number]): Promise<string> => {
     switch(notification.type) {
         case 'application_submitted':
             if (type === 'app') return ''
@@ -27,7 +28,14 @@ const getMessage = (type: 'app' | 'gp', chain: string, entityInfo: GetEntityQuer
             return `The proposal with title <b>${sanitizeString(entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value)}</b> submitted to grant program <b>${sanitizeString(entityInfo.grant?.title)}</b> was asked to resubmitted. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the update.`
 
         case 'comment_added':
-            return `A new comment was received to proposal with title <b>${sanitizeString(entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value)}</b> submitted to grant program <b>${sanitizeString(entityInfo.grant?.title)}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the comment.`
+            const comment = entityInfo.comments?.find((comment) => comment?.application?.id === entityInfo?.grantApplication?.id && comment?.grant?.id === entityInfo?.grant?.id)
+            if (comment?.isPrivate) {
+                return `A new private comment was received to proposal with title <b>${sanitizeString(entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value)}</b> submitted to grant program <b>${sanitizeString(entityInfo.grant?.title)}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the comment.`
+            } else {
+                const ipfsData = JSON.parse(await getFromIPFS(comment?.commentsPublicHash))
+                const message = JSON.parse(await getFromIPFS(ipfsData?.message))
+                return `A new comment, "${sanitizeString(message)}", was received to proposal with title <b>${sanitizeString(entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value)}</b> submitted to grant program <b>${sanitizeString(entityInfo.grant?.title)}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the comment.`
+            }
 
         case 'funds_disbursed_from_safe':
             if (notification.title.includes('executed')) {

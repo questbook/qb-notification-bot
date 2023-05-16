@@ -90,6 +90,7 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
             notif.entityIds
               .find((e) => e.startsWith("application"))
               ?.split("-")[1] ?? "0x0",
+          timestamp: notif.cursor,
         }
       );
 
@@ -124,7 +125,7 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
         // 2. Send a notification to each user - based on what type of notification it is
         let count = 0;
 
-        const message = getMessage(
+        const message = await getMessage(
           type as "gp" | "app",
           chain.toString(),
           entityInfo,
