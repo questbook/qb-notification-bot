@@ -93,14 +93,14 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
           timestamp: notif.cursor,
         }
       );
-
+      const receivedUsers: string[] = []
       for (const entity of notif.entityIds) {
         // 1. Fetch the list of users subscribed to this entity
         let type = entity.startsWith("grant")
           ? "gp"
           : entity.startsWith("application")
-          ? "app"
-          : "";
+            ? "app"
+            : "";
         if (type === "") continue;
 
         const key = `${type}-${entity.split("-")[1]}-${chain}`;
@@ -120,7 +120,7 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
 
         const users = unmarshall(response?.Item);
         delete users.key;
-        console.log(users);
+        // console.log(users);
 
         // 2. Send a notification to each user - based on what type of notification it is
         let count = 0;
@@ -131,10 +131,15 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
           entityInfo,
           notif
         );
+
         if (message === "") continue;
-        console.log(message);
+
         for (const user in users) {
+          if (receivedUsers.find(element => element==user)) continue
+          receivedUsers.push(user)
+
           console.log(user, users[user]);
+          
           const chatId = users[user];
           try {
             await bot.telegram.sendMessage(chatId, message, {
