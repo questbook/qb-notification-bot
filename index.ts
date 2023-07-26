@@ -45,6 +45,7 @@ bot.start(async (ctx) => {
         grantId:
           type === "gp" ? entity : "0x0000000000000000000000000000000000000000",
         appId: type === "app" ? entity : "0x0",
+        timestamp: Math.floor(Date.now() / 1000)
       });
 
       if (type === "gp" && res.grant === null)
