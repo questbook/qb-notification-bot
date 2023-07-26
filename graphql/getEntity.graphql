@@ -1,4 +1,4 @@
-query getEntity($grantId: String!, $appId: ID!, $timestamp: Int!) {
+query getEntity($grantId: ID!, $appId: ID!, $timestamp: Int!) {
   grant(id: $grantId) {
     id
     title
