@@ -5950,7 +5950,7 @@ query getEntity($grantId: String!, $appId: String!, $timestamp: Float!) {
       id:_id
       title
     }
-    title: fieldFilterByRegex(filter: { field: "projectName" }) {
+    title: fieldFilterBySection(filter: { field: "projectName" }) {
       values {
         value
       }
