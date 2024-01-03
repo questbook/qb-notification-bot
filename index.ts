@@ -1,9 +1,8 @@
 import http from "serverless-http";
 import { Telegraf } from "telegraf";
 import dotenv from "dotenv";
-import { ethers } from "ethers";
 import { DynamoDBClient, GetItemCommand } from "@aws-sdk/client-dynamodb";
-import { subgraphURLS } from "./utils/constants";
+import { offchainSubgraphURLS, subgraphURLS } from "./utils/constants";
 import { GraphQLClient } from "graphql-request";
 import { GetEntity, GetEntityQuery } from "./src/generated/graphql";
 import { addNewSubscription } from "./utils/addNewSubscription";
@@ -36,11 +35,11 @@ bot.start(async (ctx) => {
       const chain = parseInt(_chain);
       if (!(chain in subgraphURLS)) throw new Error("Invalid chain");
       if (type !== "app" && type !== "gp") throw new Error("Invalid type");
-      if (type === "gp" && !ethers.utils.isAddress(entity))
+      if (type === "gp" && !entity)
         throw new Error("Invalid grant address");
 
       // 1. Check if this is a valid grant or app ID
-      const graphQLClient = new GraphQLClient(subgraphURLS[chain]);
+      const graphQLClient = new GraphQLClient(offchainSubgraphURLS);
       const res: GetEntityQuery = await graphQLClient.request(GetEntity, {
         grantId:
           type === "gp" ? entity : "0x0000000000000000000000000000000000000000",

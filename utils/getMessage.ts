@@ -1,6 +1,5 @@
 import { GetEntityQuery, GetNotificationsQuery } from "../src/generated/graphql";
 import { getDashboardLink } from "./getDashboardLink";
-import { getFromIPFS } from "./ipfs";
 
 const sanitizeString = (str: string): string => {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -33,8 +32,9 @@ const getMessage = async (type: 'app' | 'gp', chain: string, entityInfo: GetEnti
                 return `A new private comment was received to proposal with title <b>${sanitizeString(entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value)}</b> submitted to grant program <b>${sanitizeString(entityInfo.grant?.title)}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the comment.`
             } else {
                 try {
-                    const ipfsData = JSON.parse(await getFromIPFS(comment?.commentsPublicHash))
-                    const message = await getFromIPFS(ipfsData?.message)
+                    const ipfsData = comment?.commentsPublicHash
+                    //@ts-ignore
+                    const message = ipfsData?.message 
                     return `A new comment, "${sanitizeString(message)}", was received to proposal with title <b>${sanitizeString(entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value)}</b> submitted to grant program <b>${sanitizeString(entityInfo.grant?.title)}</b>. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the comment.`
                 }
                 catch (e) {

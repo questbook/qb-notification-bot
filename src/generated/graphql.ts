@@ -5938,52 +5938,60 @@ export type GetNotificationsQuery = { __typename?: 'Query', notifications: Array
 
 
 export const GetEntity = gql`
-    query getEntity($grantId: ID!, $appId: ID!, $timestamp: Int!) {
-  grant(id: $grantId) {
-    id
+query getEntity($grantId: String!, $appId: String!, $timestamp: Float!) {
+  grant(_id: $grantId) {
+    id:_id
     title
   }
-  grantApplication(id: $appId) {
-    id
+
+  grantApplication(_id: $appId) {
+    id:_id
     grant {
-      id
+      id:_id
       title
     }
-    title: fields(where: {field_ends_with: "projectName"}) {
+    title: fieldFilterByRegex(filter: { field: "projectName" }) {
       values {
         value
       }
     }
     version
   }
-  comments(where: {createdAt: $timestamp}) {
-    id
+
+  comments(filter: {createdAt: $timestamp}) {
+    id:_id
     commentsPublicHash
     grant {
-      id
+      id:_id
     }
     application {
-      id
+      id:_id
     }
     isPrivate
   }
 }
     `;
 export const GetNotifications = gql`
-    query getNotifications($first: Int!, $skip: Int!, $from: Int!, $to: Int!) {
+query getNotifications($first: Int!, $skip: Int!, $from: Float!, $to: Float!) {
   notifications(
-    first: $first
+    limit: $first
     skip: $skip
-    where: {cursor_gt: $from, cursor_lte: $to}
-    orderBy: cursor
-    orderDirection: asc
+    filter: {
+      _operators: {
+        cursor: {
+          gte: $from,
+          lte: $to
+        }
+      }
+    }
+   sort: CURSOR_ASC
   ) {
-    id
+    id: _id
     title
     content
     type
     entityIds
-    actorId
+  	actorId
     cursor
   }
 }

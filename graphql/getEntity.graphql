@@ -1,16 +1,16 @@
-query getEntity($grantId: ID!, $appId: ID!, $timestamp: Int!) {
-  grant(id: $grantId) {
-    id
+query getEntity($grantId: String!, $appId: String!, $timestamp: Float!) {
+  grant(_id: $grantId) {
+    id:_id
     title
   }
 
-  grantApplication(id: $appId) {
-    id
+  grantApplication(_id: $appId) {
+    id:_id
     grant {
-      id
+      id:_id
       title
     }
-    title: fields(where: { field_ends_with: "projectName" }) {
+    title: fieldFilterBySection(filter: { field: "projectName" }) {
       values {
         value
       }
@@ -18,14 +18,14 @@ query getEntity($grantId: ID!, $appId: ID!, $timestamp: Int!) {
     version
   }
 
-  comments(where: {createdAt: $timestamp}) {
-    id
+  comments(filter: {createdAt: $timestamp}) {
+    id:_id
     commentsPublicHash
     grant {
-      id
+      id:_id
     }
     application {
-      id
+      id:_id
     }
     isPrivate
   }
