@@ -25,11 +25,9 @@ bot.start(async (ctx) => {
   }
 
   const payload = ctx.startPayload;
-  console.log(payload)
   if (payload) {
     try {
       const decodedPayload = Buffer.from(payload, "base64").toString("utf8");
-      console.log(decodedPayload)
       const [type, entity, _chain, scwAddress] = decodedPayload.split("-");
       console.log("Setup notification for: ", type, entity, _chain, scwAddress);
       const chain = parseInt(_chain);
