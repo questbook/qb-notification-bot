@@ -46,7 +46,7 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
     return;
   }
   const lastFetchedTimestamp = parseInt(response?.Item?.timestamp.N);
-
+  console.log("lastFetchedTimestamp: ", lastFetchedTimestamp, currentTimestamp);
   // 3. For each chain, fetch the notifications from the subgraph, and send out Telegram messages
   for (const chain in subgraphURLS) {
     const first = 100;

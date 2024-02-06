@@ -2809,6 +2809,7 @@ export enum NotificationType {
   ApplicationRejected = 'application_rejected',
   ApplicationResubmitted = 'application_resubmitted',
   ApplicationSubmitted = 'application_submitted',
+  ApplicationReview = 'application_review',
   CommentAdded = 'comment_added',
   FundsDeposited = 'funds_deposited',
   FundsDisbursed = 'funds_disbursed',

@@ -1,11 +1,11 @@
 import { NotificationType } from "../src/generated/graphql"
 
 const subgraphURLS = {
-    5: 'https://the-graph.questbook.app/subgraphs/name/qb-subgraph-goerli-testnet',
-    10: 'https://the-graph.questbook.app/subgraphs/name/qb-subgraph-optimism-mainnet',
+    5: 'https://api-grants.questbook.app/graphql',
+    10: 'https://api-grants.questbook.app/graphql',
 }
 
-const offchainSubgraphURLS = 'https://api-grants.questbook.app'
+const offchainSubgraphURLS = 'https://api-grants.questbook.app/graphql'
 
 const permittedNotificationTypes = [NotificationType.ApplicationSubmitted, NotificationType.ApplicationAccepted, NotificationType.ApplicationRejected, NotificationType.ApplicationResubmitted, NotificationType.CommentAdded, NotificationType.FundsDisbursedFromSafe, NotificationType.ReviewSubmitted]
 

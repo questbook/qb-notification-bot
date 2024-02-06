@@ -25,7 +25,9 @@ const getMessage = async (type: 'app' | 'gp', chain: string, entityInfo: GetEnti
 
         case 'application_resubmitted':
             return `The proposal with title <b>${sanitizeString(entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value)}</b> submitted to grant program <b>${sanitizeString(entityInfo.grant?.title)}</b> was asked to resubmitted. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the update.`
-
+        
+        case 'application_review':
+            return `The proposal with title <b>${sanitizeString(entityInfo.grantApplication?.title?.[0]?.values?.[0]?.value)}</b> submitted to grant program <b>${sanitizeString(entityInfo.grant?.title)}</b> has been reviewed. Visit <a href=\"${getDashboardLink(entityInfo.grant?.id, chain, entityInfo?.grantApplication?.id)}\">Dashboard</a> to view the update.`
         case 'comment_added':
             const comment = entityInfo.comments?.find((comment) => comment?.application?.id === entityInfo?.grantApplication?.id && comment?.grant?.id === entityInfo?.grant?.id)
             if (comment?.isPrivate) {
