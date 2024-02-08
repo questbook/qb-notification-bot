@@ -7,6 +7,6 @@ const subgraphURLS = {
 
 const offchainSubgraphURLS = 'https://api-grants.questbook.app/graphql'
 
-const permittedNotificationTypes = [NotificationType.ApplicationSubmitted, NotificationType.ApplicationAccepted, NotificationType.ApplicationRejected, NotificationType.ApplicationResubmitted, NotificationType.CommentAdded, NotificationType.FundsDisbursedFromSafe, NotificationType.ReviewSubmitted]
+const permittedNotificationTypes = [NotificationType.ApplicationSubmitted, NotificationType.ApplicationAccepted, NotificationType.ApplicationRejected, NotificationType.ApplicationResubmitted, NotificationType.ApplicationReview, NotificationType.CommentAdded, NotificationType.FundsDisbursedFromSafe, NotificationType.ReviewSubmitted]
 
 export { subgraphURLS, permittedNotificationTypes, offchainSubgraphURLS }
