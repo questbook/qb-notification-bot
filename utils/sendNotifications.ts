@@ -153,6 +153,7 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
             }
           } catch (e) {
             console.error("Error sending message to chatId: ", chatId, e);
+            break
           }
         }
 
