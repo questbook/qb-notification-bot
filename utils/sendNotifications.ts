@@ -51,10 +51,13 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
   for (const chain in subgraphURLS) {
     const first = 100;
     let skip = 0;
+    const MAX_ITERATIONS = 10;
+    let iterations = 0;
+
 
     const graphQLClient = new GraphQLClient(subgraphURLS[chain]);
     const notifs: GetNotificationsQuery["notifications"] = [];
-    while (true) {
+    while (iterations < MAX_ITERATIONS) {
       const res: GetNotificationsQuery = await graphQLClient.request(
         GetNotifications,
         {
@@ -69,6 +72,7 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
 
       if (res.notifications.length < first) break;
       skip += first;
+      iterations++;
     }
 
     if (notifs.length === 0) {
@@ -153,7 +157,6 @@ export const run = async (event: APIGatewayProxyEvent, context: Context) => {
             }
           } catch (e) {
             console.error("Error sending message to chatId: ", chatId, e);
-            break
           }
         }
 
