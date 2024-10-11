@@ -24,8 +24,11 @@ jobs:
     - name: Copy env
       run: 'echo -e "${{secrets.ENV}}" > .env.production'
     
+    - name: Install Serverless Framework
+      run: yarn global add serverless
+    
     - name: Serverless AWS authentication
-      run: yarn sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY }} --secret ${{ secrets.AWS_SECRET_KEY }}
+      run: serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY }} --secret ${{ secrets.AWS_SECRET_KEY }}
     
     - name: Deploy Lambda functions
-      run: NODE_ENV=production yarn sls deploy
+      run: NODE_ENV=production serverless deploy
